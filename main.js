@@ -20,7 +20,7 @@ renderer.setSize(window.innerWidth, window.innerHeight)
 
 const texture = textureLoader.load("favicon.svg")
 const geometry = new THREE.TorusGeometry(10, 3, 16, 100)
-const material = new THREE.MeshBasicMaterial({ map: texture })
+const material = new THREE.MeshBasicMaterial({ map: texture, wireframe: true })
 const torus = new THREE.Mesh(geometry, material)
 scene.add(torus)
 
@@ -32,13 +32,14 @@ camera.position.setZ(30);
 const controls = new OrbitControls(camera, renderer.domElement)
 
 function addStar() {
-  const geometry = new THREE.SphereGeometry(0.2)
-  const material = new THREE.MeshStandardMaterial(0xffffff)
+  const geometry = new THREE.BoxGeometry(3, 3, 3)
+  const material = new THREE.MeshStandardMaterial({ color: 0xffffff, wireframe: true })
   const star = new THREE.Mesh(geometry, material)
-  
+
   const [x, y, z] = Array(3).fill().map(() => THREE.MathUtils.randFloatSpread(100))
-  
+
   star.position.set(x, y, z)
+  star.rotation.set(x, y, z)
   scene.add(star)
 }
 Array(200).fill().forEach(addStar)
@@ -46,13 +47,23 @@ Array(200).fill().forEach(addStar)
 
 function animate() {
   requestAnimationFrame(animate)
-  
-  torus.rotateX(.01)
+
+  torus.rotateX(.001)
   torus.rotateY(.004)
-  
+  torus.rotateZ(.009)
+
   controls.update()
-  
+
   renderer.render(scene, camera)
 }
 
 animate()
+
+const container = renderer.domElement.parentElement;
+
+window.onresize = function onContainerResize() {
+  console.log('resized')
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth/window.innerHeight
+  camera.updateProjectionMatrix()
+}
